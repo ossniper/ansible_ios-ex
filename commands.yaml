@@ -1,0 +1,25 @@
+
+- name: Show router information
+  hosts: hqrouter
+  gather_facts: false
+  connection: network_cli
+
+
+# This task will display information about this router based on the command listed
+
+  tasks:
+   - name: Show Int brief
+     ios_command:
+       commands:
+         - sh run
+         - sh ip pro
+         - sh version
+         - sh ip int br
+
+     register: print_output
+
+   - name: Printing output
+   - debug: var=print_output.stdout_lines
+
+
+

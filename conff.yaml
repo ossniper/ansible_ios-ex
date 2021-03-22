@@ -1,0 +1,38 @@
+
+- name: config**router hq
+  hosts: hqrouter
+  gather_facts: false
+  connection: network_cli
+
+# configure the hostname and eigrp on the device
+  tasks:
+    - name: configure routing protocol
+      ios_config:
+        lines:
+          - hostname {{inventory_hostname}}
+          - router eigrp 100
+          - network 0.0.0.0 0.0.0.0
+          - eigrp router-id 10.10.10.10
+
+    - name: configure address
+# configure the serial interface with ip add and desccription
+      ios_config:
+        save_when: modified
+        lines: 
+          - ip address 100.100.2.1 255.255.255.252
+          - no shut
+          - description **ansible config2**
+        parents: int serial 0/2
+        match: exact
+
+# configure ntp server and will save the running-config once modified and completed
+    - name: ntp server
+      ios_config:
+        save_when: modified
+        lines:
+          - ntp server 8.8.8.8
+          - ntp server 192.168.122.1
+      register: output 
+      
+      debug: var=output.stdout_lines
+
